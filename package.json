@@ -1,6 +1,6 @@
 {
   "name": "eventemitter-wrapper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Control event groups",
   "main": "index.js",
   "scripts": {
