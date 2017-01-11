@@ -1,0 +1,20 @@
+{
+  "name": "eventemitter-wrapper",
+  "version": "0.0.1",
+  "description": "Control event groups",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "inspect": "node --inspect index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Unchosen/eventemitter-wrapper"
+  },
+  "author": "unchosen.aus@gmail.com",
+  "license": "MIT",
+  "keywords": [
+    "event",
+    "eventemitter"
+  ]
+}
