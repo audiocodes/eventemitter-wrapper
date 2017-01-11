@@ -6,7 +6,11 @@ exports.createWrapper = (eventEmitterInstance)=>{
 		__proto__: wrapperProto
 	};
 	eventEmitterInstance.on('removeListener',(eventName,listener)=>{
-		if(eventName in wrappedEvents._eventStore) wrappedEvents.removeListener(eventName,listener);
+		if(eventName in wrappedEvents._eventStore){
+			var pos = wrappedEvents._eventStore[eventName].indexOf(listener);
+			if(pos!==-1) wrappedEvents._eventStore[eventName].splice(pos,1);
+			if(wrappedEvents._eventStore[eventName].length===0) delete wrappedEvents._eventStore[eventName];
+		}
 	});
 	return wrappedEvents;
 };
@@ -73,11 +77,7 @@ var wrapperProto = {
 		return this;
 	},
 	removeListener: function(eventName,listener){
-		if(eventName in this._eventStore){
-			var pos = this._eventStore[eventName].indexOf(listener);
-			if(pos!==-1) this._eventStore[eventName].splice(pos,1);
-			if(this._eventStore[eventName].length===0) delete this._eventStore[eventName];
-		}
+		// Removal from this._eventStore is done on the 'removeListener' event
 		this._eventEmitterInstance.removeListener(eventName,listener);
 		return this;
 	}
