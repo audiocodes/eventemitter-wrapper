@@ -1,10 +1,8 @@
 
 exports.createWrapper = (eventEmitterInstance)=>{
-	var wrappedEvents = {
-		_eventStore: {},
-		_eventEmitterInstance: eventEmitterInstance,
-		__proto__: wrapperProto
-	};
+	var wrappedEvents = Object.create(wrapperProto);
+	wrappedEvents._eventStore = {};
+	wrappedEvents._eventEmitterInstance = eventEmitterInstance;
 	eventEmitterInstance.on('removeListener',(eventName,listener)=>{
 		if(eventName in wrappedEvents._eventStore){
 			var pos = wrappedEvents._eventStore[eventName].indexOf(listener);
