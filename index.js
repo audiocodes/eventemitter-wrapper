@@ -3,17 +3,35 @@ exports.createWrapper = (eventEmitterInstance)=>{
 	var wrappedEvents = Object.create(wrapperProto);
 	wrappedEvents._eventStore = {};
 	wrappedEvents._eventEmitterInstance = eventEmitterInstance;
-	eventEmitterInstance.on('removeListener',(eventName,listener)=>{
+	wrappedEvents._eventRemoveListener = (eventName,listener)=>{
 		if(eventName in wrappedEvents._eventStore){
 			var pos = wrappedEvents._eventStore[eventName].indexOf(listener);
 			if(pos!==-1) wrappedEvents._eventStore[eventName].splice(pos,1);
 			if(wrappedEvents._eventStore[eventName].length===0) delete wrappedEvents._eventStore[eventName];
 		}
-	});
+	};
+	wrappedEvents._eventRemoveListenerAttached = false;
 	return wrappedEvents;
 };
 
 var wrapperProto = {
+	_eventRemoveListenerCheck: function(){
+		var hasEvents = false;
+		for(var e in this._eventStore){
+			if(this._eventStore[e].length>0){
+				hasEvents = true;
+				break;
+			}
+		}
+		if(this._eventRemoveListenerAttached && !hasEvents){
+			this._eventEmitterInstance.removeListener('removeListener',this._eventRemoveListener);
+			this._eventRemoveListenerAttached = false;
+		}
+		else if(!this._eventRemoveListenerAttached && hasEvents){
+			this._eventEmitterInstance.on('removeListener',this._eventRemoveListener);
+			this._eventRemoveListenerAttached = true;
+		}
+	},
 	addListener: function(a,b){
 		return this.on(a,b);
 	},
@@ -21,6 +39,7 @@ var wrapperProto = {
 		if(!(eventName in this._eventStore)) this._eventStore[eventName] = [];
 		this._eventStore[eventName].push(listener);
 		this._eventEmitterInstance.on(eventName,listener);
+		this._eventRemoveListenerCheck();
 		return this;
 	},
 	once: function(eventName,listener){
@@ -31,6 +50,7 @@ var wrapperProto = {
 		if(!(eventName in this._eventStore)) this._eventStore[eventName] = [];
 		this._eventStore[eventName].push(listener2);
 		this._eventEmitterInstance.once(eventName,listener2);
+		this._eventRemoveListenerCheck();
 		return this;
 	},
 	listeners: function(eventName){
@@ -50,6 +70,7 @@ var wrapperProto = {
 		if(!(eventName in this._eventStore)) this._eventStore[eventName] = [];
 		this._eventStore[eventName].unshift(listener);
 		this._eventEmitterInstance.prependListener(eventName,listener);
+		this._eventRemoveListenerCheck();
 		return this;
 	},
 	prependOnceListener: function(eventName,listener){
@@ -60,6 +81,7 @@ var wrapperProto = {
 		if(!(eventName in this._eventStore)) this._eventStore[eventName] = [];
 		this._eventStore[eventName].unshift(listener2);
 		this._eventEmitterInstance.prependOnceListener(eventName,listener2);
+		this._eventRemoveListenerCheck();
 		return this;
 	},
 	removeAllListeners: function(eventName){
@@ -72,11 +94,13 @@ var wrapperProto = {
 				this.removeListener(eventName,this._eventStore[eventName][i]);
 			}
 		}
+		this._eventRemoveListenerCheck();
 		return this;
 	},
 	removeListener: function(eventName,listener){
 		// Removal from this._eventStore is done on the 'removeListener' event
 		this._eventEmitterInstance.removeListener(eventName,listener);
+		this._eventRemoveListenerCheck();
 		return this;
 	}
 };
