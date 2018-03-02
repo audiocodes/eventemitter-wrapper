@@ -20,7 +20,7 @@ Install the module via [NPM](https://www.npmjs.com/package/eventemitter-wrapper)
 ```
 npm install eventemitter-wrapper --save
 ```
-Or [download the latest release](https://github.com/Unchosen/eventemitter-wrapper/releases), or git clone the [repository on GitHub](https://github.com/Unchosen/eventemitter-wrapper).
+Or [download the latest release](https://github.com/Jashepp/eventemitter-wrapper/releases), or git clone the [repository on GitHub](https://github.com/Jashepp/eventemitter-wrapper).
 
 This module is written with ES6 features.
 
@@ -127,7 +127,7 @@ All the help is appreciated.
 
 MIT License
 
-Copyright (c) 2017 Jason Sheppard @ https://github.com/Unchosen
+Copyright (c) 2018 Jason Sheppard @ https://github.com/Jashepp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -149,7 +149,7 @@ SOFTWARE.
 
 ## Links
 
-Github Repository: [https://github.com/Unchosen/eventemitter-wrapper](https://github.com/Unchosen/eventemitter-wrapper)
+Github Repository: [https://github.com/Jashepp/eventemitter-wrapper](https://github.com/Jashepp/eventemitter-wrapper)
 
 NPM Package: [https://www.npmjs.com/package/eventemitter-wrapper](https://www.npmjs.com/package/eventemitter-wrapper)
 
