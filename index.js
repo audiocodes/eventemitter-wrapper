@@ -1,115 +1,163 @@
+"use strict";
 
-exports.createWrapper = (eventEmitterInstance)=>{
-	var wrappedEvents = Object.create(wrapperProto);
-	wrappedEvents._eventStore = new Map();
-	wrappedEvents._eventEmitterInstance = eventEmitterInstance;
-	wrappedEvents._eventRemoveListener = (eventName,listener)=>{
-		if(wrappedEvents._eventStore.has(eventName)){
-			if(wrappedEvents._eventStore.size===0) wrappedEvents._eventStore.delete(eventName);
-		}
-	};
-	wrappedEvents._eventRemoveListenerAttached = false;
-	wrappedEvents._eventOnceAlias = new WeakMap();
-	return wrappedEvents;
-};
+const EventEmitter = require('node:events');
 
-var wrapperProto = {
-	_eventRemoveListenerCheck: function(){
-		var hasEvents = false;
-		for(let [eventName,set] of this._eventStore){
-			if(set.size>0){ hasEvents = true; break; }
+class EventEmitterWrapper {
+
+	constructor(eventEmitter){
+		if(!(eventEmitter instanceof EventEmitter)) throw new TypeError('eventEmitter must be an instance of EventEmitter');
+		this._eewEventStore = new Map();
+		this._eewEmitter = eventEmitter;
+		this._eewRemoveListenerAttached = false;
+		this._eewOnceAlias = new WeakMap();
+		this._eewRemoveListenerBound = this._eewRemoveListener.bind(this);
+	}
+
+	_eewRemoveListener(eventName,listener){
+		if(!(typeof eventName==='string' || eventName instanceof String)) throw new TypeError('eventName must be a string');
+		if(!(listener instanceof Function)) throw new TypeError('listener must be a function');
+		if(this._eewEventStore.has(eventName)){
+			let listenStore = this._eewEventStore.get(eventName);
+			if(listenStore.has(listener)){
+				let count = listenStore.get(listener);
+				if(count>1) listenStore.set(listener,count-1);
+				else listenStore.delete(listener);
+			}
+			if('listener' in listener && this._eewOnceAlias.get(listener.listener)===listener){
+				this._eewOnceAlias.delete(listener.listener);
+			}
+			this._eewRemoveListenerCheck();
 		}
-		if(this._eventRemoveListenerAttached && !hasEvents){
-			this._eventEmitterInstance.removeListener('removeListener',this._eventRemoveListener);
-			this._eventRemoveListenerAttached = false;
+	}
+
+	_eewRemoveListenerCheck(){
+		let hasEvents = false;
+		for(let listenStore of this._eewEventStore.values()){
+			if(listenStore.size>0){ hasEvents = true; break; }
 		}
-		else if(!this._eventRemoveListenerAttached && hasEvents){
-			this._eventEmitterInstance.on('removeListener',this._eventRemoveListener);
-			this._eventRemoveListenerAttached = true;
+		if(this._eewRemoveListenerAttached && !hasEvents){
+			this._eewEmitter.removeListener('removeListener',this._eewRemoveListenerBound);
+			this._eewRemoveListenerAttached = false;
 		}
-		for(let [eventName,set] of this._eventStore){
-			if(set.size===0) this._eventStore.delete(eventName);
+		else if(!this._eewRemoveListenerAttached && hasEvents){
+			this._eewEmitter.on('removeListener',this._eewRemoveListenerBound);
+			this._eewRemoveListenerAttached = true;
 		}
-	},
-	addListener: function(a,b){
-		return this.on(a,b);
-	},
-	on: function(eventName,listener){
-		if(!this._eventStore.has(eventName)) this._eventStore.set(eventName,new Set());
-		this._eventStore.get(eventName).add(listener);
-		this._eventEmitterInstance.on(eventName,listener);
-		this._eventRemoveListenerCheck();
-		return this;
-	},
-	once: function(eventName,listener){
-		var listener2 = (...args)=>{
-			if(this._eventStore.has(eventName)) this._eventStore.get(eventName).delete(listener2);
+		for(let [eventName,listenStore] of this._eewEventStore){
+			if(listenStore.size===0) this._eewEventStore.delete(eventName);
+		}
+	}
+
+	_eewListenEventMethod(method,eventName,listener){
+		if(!(method in this._eewEmitter)) throw new TypeError('method must be a function on eventEmitter');
+		if(!(typeof eventName==='string' || eventName instanceof String)) throw new TypeError('eventName must be a string');
+		if(!(listener instanceof Function)) throw new TypeError('listener must be a function');
+		let listenStore = this._eewEventStore.get(eventName);
+		if(!listenStore) this._eewEventStore.set(eventName,listenStore = new Map());
+		listenStore.set(listener,(listenStore.get(listener)||0)+1);
+		this._eewEmitter[method](eventName,listener);
+		this._eewRemoveListenerCheck();
+	}
+
+	_eewOnce(method,eventName,listener){
+		if(!(method in this._eewEmitter)) throw new TypeError('method must be a function on eventEmitter');
+		if(!(typeof eventName==='string' || eventName instanceof String)) throw new TypeError('eventName must be a string');
+		if(!(listener instanceof Function)) throw new TypeError('listener must be a function');
+		let onceWrapper = (...args)=>{
+			this._eewRemoveListener(eventName,onceWrapper);
 			return listener(...args);
 		};
-		this._eventOnceAlias.set(listener,listener2);
-		if(!this._eventStore.has(eventName)) this._eventStore.set(eventName,new Set());
-		this._eventStore.get(eventName).add(listener2);
-		this._eventEmitterInstance.once(eventName,listener2);
-		this._eventRemoveListenerCheck();
+		onceWrapper.listener = listener;
+		this._eewOnceAlias.set(listener,onceWrapper);
+		this._eewListenEventMethod(method,eventName,onceWrapper);
+	}
+
+	get eventEmitter(){
+		return this._eewEmitter;
+	}
+
+	addListener(eventName,listener){
+		this._eewListenEventMethod('addListener',eventName,listener);
 		return this;
-	},
-	listeners: function(eventName){
-		if(this._eventStore.has(eventName)) return this._eventStore.get(eventName).values();
-		else return [];
-	},
-	listenerCount: function(eventName){
-		return this.listeners(eventName).length;
-	},
-	eventNames: function(){
-		return this._eventStore.keys();
-	},
-	emit: function(eventName,...args){
-		return this._eventEmitterInstance.emit(eventName,...args);
-	},
-	prependListener: function(eventName,listener){
-		if(!this._eventStore.has(eventName)) this._eventStore.set(eventName,new Set());
-		this._eventStore.get(eventName).add(listener);
-		this._eventEmitterInstance.prependListener(eventName,listener);
-		this._eventRemoveListenerCheck();
+	}
+
+	on(eventName,listener){
+		return this.addListener(eventName,listener);
+	}
+
+	once(eventName,listener){
+		this._eewOnce('once',eventName,listener);
 		return this;
-	},
-	prependOnceListener: function(eventName,listener){
-		var listener2 = (...args)=>{
-			if(this._eventStore.has(eventName)) this._eventStore.get(eventName).delete(listener2);
-			return listener(...args);
-		};
-		this._eventOnceAlias.set(listener,listener2);
-		if(!this._eventStore.has(eventName)) this._eventStore.set(eventName,new Set());
-		this._eventStore.get(eventName).add(listener2);
-		this._eventEmitterInstance.prependOnceListener(eventName,listener2);
-		this._eventRemoveListenerCheck();
+	}
+
+	rawListeners(eventName){
+		if(this._eewEventStore.has(eventName)) return this._eewEventStore.get(eventName).keys();
+		return [];
+	}
+
+	listeners(eventName){
+		return this.rawListeners(eventName).map((listener)=>{
+			if('listener' in listener && this._eewOnceAlias.get(listener.listener)===listener) return listener.listener;
+			return listener;
+		});
+	}
+
+	listenerCount(eventName,listener){
+		if(listener && this._eewEventStore.has(eventName)) return this._eewEventStore.get(eventName).get(listener);
+		if(this._eewEventStore.has(eventName)) return this._eewEventStore.get(eventName).size;
+		return 0;
+	}
+	
+	eventNames(){
+		return this._eewEventStore.keys();
+	}
+
+	emit(eventName,...args){
+		return this._eewEmitter.emit(eventName,...args);
+	}
+
+	prependListener(eventName,listener){
+		this._eewListenEventMethod('prependListener',eventName,listener);
 		return this;
-	},
-	removeAllListeners: function(eventName){
+	}
+
+	prependOnceListener(eventName,listener){
+		this._eewOnce('prependOnceListener',eventName,listener);
+		return this;
+	}
+
+	removeAllListeners(eventName){
 		if(eventName===void 0){
-			for(let [eventName,set] of this._eventStore){
+			for(let eventName of this._eewEventStore.keys()){
 				this.removeAllListeners(eventName);
 			}
-		} else if(this._eventStore.has(eventName)){
-			let set = this._eventStore.get(eventName);
-			for(let listener of set){
+		}
+		else if(this._eewEventStore.has(eventName)){
+			for(let listener of this._eewEventStore.get(eventName).keys()){
 				this.removeListener(eventName,listener);
 			}
 		}
-		this._eventRemoveListenerCheck();
 		return this;
-	},
-	removeListener: function(eventName,listener){
-		// Removal from this._eventStore is done on the 'removeListener' event
-		if(listener){
-			this._eventEmitterInstance.removeListener(eventName,listener);
-			if(this._eventOnceAlias.has(listener)){
-				this._eventEmitterInstance.removeListener(eventName,this._eventOnceAlias.get(listener));
-				this._eventOnceAlias.delete(listener);
-			}
-		}
-		this._eventRemoveListenerCheck();
+	}
+
+	removeListener(eventName,listener){
+		if(listener && this._eewOnceAlias.has(listener)) listener = this._eewOnceAlias.get(listener);
+		if(listener) this._eewEmitter.removeListener(eventName,listener);
 		return this;
-	},
-	setMaxListeners: function(n){ return this._eventEmitterInstance.setMaxListeners(n); }
-};
+	}
+
+	off(eventName,listener){
+		return this.removeListener(eventName,listener);
+	}
+
+	getMaxListeners(){ return this._eewEmitter.getMaxListeners(); }
+
+	setMaxListeners(n){ return this._eewEmitter.setMaxListeners(n); }
+
+}
+
+module.exports = EventEmitterWrapper;
+
+module.exports.EventEmitterWrapper = EventEmitterWrapper;
+
+module.exports.createWrapper = (eventEmitter)=>new EventEmitterWrapper(eventEmitter);
