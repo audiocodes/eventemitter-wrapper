@@ -2,10 +2,11 @@
   "name": "eventemitter-wrapper",
   "version": "1.0.0",
   "description": "Control event groups",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
-    "start": "node index.js",
-    "inspect": "node --inspect index.js"
+    "test": "mocha -t 10000 --recursive tests/**/*.js --check-leaks --use_strict --exit",
+    "test-parallel": "mocha -t 10000 --recursive tests/**/*.js --check-leaks --use_strict --parallel --exit",
+    "test-watch": "mocha -t 10000 --recursive tests/**/*.js --check-leaks --use_strict --watch --bail --full-trace --trace-deprecation --exit"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,10 @@
   "keywords": [
     "event",
     "eventemitter"
-  ]
+  ],
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "underscore": "^1.13.6"
+  }
 }
