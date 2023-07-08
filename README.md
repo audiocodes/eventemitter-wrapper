@@ -116,7 +116,22 @@ console.log(eventGroup1.eventNames())
 
 ## Tests
 
-None at the moment.
+Tests are located within `./tests/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include tests.
+
+To get started with tests, enter local directory of this repository and run:
+```
+npm install --only=dev
+```
+
+To run the tests, run:
+```
+npm run test
+```
+
+To continuously run tests while editing, run:
+```
+npm run watch:test
+```
 
 ## Contributors
 
@@ -157,5 +172,6 @@ NPM Package: [https://www.npmjs.com/package/eventemitter-wrapper](https://www.np
 [npm-image]: https://img.shields.io/npm/v/eventemitter-wrapper.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/eventemitter-wrapper
 [npm-downloads]: https://img.shields.io/npm/dm/eventemitter-wrapper.svg?style=flat-square
+[github-branch]: https://github.com/Jashepp/eventemitter-wrapper
 [github-tests-badge]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml/badge.svg
 [github-tests-url]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml
