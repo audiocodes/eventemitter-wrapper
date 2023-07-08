@@ -91,7 +91,7 @@ class EventEmitterWrapper {
 	}
 
 	rawListeners(eventName){
-		if(this._eewEventStore.has(eventName)) return this._eewEventStore.get(eventName).keys();
+		if(this._eewEventStore.has(eventName)) return [...this._eewEventStore.get(eventName).keys()];
 		return [];
 	}
 
@@ -109,7 +109,7 @@ class EventEmitterWrapper {
 	}
 	
 	eventNames(){
-		return this._eewEventStore.keys();
+		return [...this._eewEventStore.keys()];
 	}
 
 	emit(eventName,...args){
