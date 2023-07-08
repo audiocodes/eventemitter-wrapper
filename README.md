@@ -3,6 +3,7 @@
 
 [![NPM Version][npm-image]][npm-url]
 [![Downloads Stats][npm-downloads]][npm-url]
+[![Tests][github-tests-badge]][github-tests-url]
 
 ## What is this?
 
@@ -127,7 +128,7 @@ All the help is appreciated.
 
 MIT License
 
-Copyright (c) 2021 Jason Sheppard @ https://github.com/Jashepp
+Copyright (c) 2023 Jason Sheppard @ https://github.com/Jashepp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -156,3 +157,5 @@ NPM Package: [https://www.npmjs.com/package/eventemitter-wrapper](https://www.np
 [npm-image]: https://img.shields.io/npm/v/eventemitter-wrapper.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/eventemitter-wrapper
 [npm-downloads]: https://img.shields.io/npm/dm/eventemitter-wrapper.svg?style=flat-square
+[github-tests-badge]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml/badge.svg
+[github-tests-url]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml
