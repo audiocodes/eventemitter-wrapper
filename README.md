@@ -173,5 +173,5 @@ NPM Package: [https://www.npmjs.com/package/eventemitter-wrapper](https://www.np
 [npm-url]: https://npmjs.org/package/eventemitter-wrapper
 [npm-downloads]: https://img.shields.io/npm/dm/eventemitter-wrapper.svg?style=flat-square
 [github-branch]: https://github.com/Jashepp/eventemitter-wrapper
-[github-tests-badge]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml/badge.svg
-[github-tests-url]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/tests-on-push.yml
+[github-tests-badge]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/run-tests.yml/badge.svg
+[github-tests-url]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/run-tests.yml
