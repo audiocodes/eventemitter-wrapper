@@ -73,24 +73,26 @@ const eventsWrapped = EventEmitterWrapper.createWrapper(events);
 
 API for the wrapped instance created via `new EventEmitterWrapper(events);`
 
-| Wrapped | Type | Original  | Notes |
-|-|-|-|-|
-| `eventEmitter` | prop | N/A | Original `EventEmitter` |
-| `addListener(eventName,listener)` | method | [`addListener(eventName,listener)`](https://nodejs.org/api/events.html#emitteraddlistenereventname-listener) | Listens on `original` & `wrapped` |
-| `on(eventName,listener)` | method | [`on(eventName,listener)`](https://nodejs.org/api/events.html#emitteroneventname-listener) | Listens on `original` & `wrapped` |
-| `once(eventName,listener)` | method | [`once(eventName, listener)`](https://nodejs.org/api/events.html#emitteronceeventname-listener) | Listens on `original` & `wrapped` |
-| `prependListener(eventName,listener)` | method | [`prependListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependlistenereventname-listener) | Listens on `original` & `wrapped` |
-| `prependOnceListener(eventName,listener)` | method | [`prependOnceListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependoncelistenereventname-listener) | Listens on `original` & `wrapped` |
-| `rawListeners(eventName)` | method | [`rawListeners(eventName)`](https://nodejs.org/api/events.html#emitterrawlistenerseventname) | Lists only `wrapped` listeners |
-| `listeners(eventName)` | method | [`listeners(eventName)`](https://nodejs.org/api/events.html#emitterlistenerseventname) | Lists only `wrapped` listeners |
-| `listenerCount(eventName[,listener])` | method | [`listenerCount(eventName[,listener])`](https://nodejs.org/api/events.html#emitterlistenercounteventname-listener) | Counts only `wrapped` listeners |
-| `eventNames()` | method | [`eventNames()`](https://nodejs.org/api/events.html#emittereventnames) | Lists only `wrapped` listeners |
-| `emit(eventName[,...args])` | method | [`emit(eventName[,...args])`](https://nodejs.org/api/events.html#emitteremiteventname-args) | Directly calls `original` method |
-| `removeAllListeners([eventName])` | method | [`removeAllListeners([eventName])`](https://nodejs.org/api/events.html#emitterremovealllistenerseventname) | Removes only `wrapped` listeners |
-| `removeListener(eventName,listener)` | method | [`removeListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterremovelistenereventname-listener) | Removes on both `original` & `wrapped` |
-| `off(eventName,listener)` | method | [`off(eventName,listener)`](https://nodejs.org/api/events.html#emitteroffeventname-listener) | Removes on both `original` & `wrapped` |
-| `getMaxListeners()` | method | [`getMaxListeners()`](https://nodejs.org/api/events.html#emittergetmaxlisteners) | Directly calls `original` method |
-| `setMaxListeners(n)` | method | [`setMaxListeners(n)`](https://nodejs.org/api/events.html#emittersetmaxlistenersn) | Directly calls `original` method |
+Only `eventEmitter` is new, along with unlisted internal methods & properties.
+
+| Method / Property | Type | Notes |
+|-|-|-|
+| `eventEmitter` | prop | Original `EventEmitter` |
+| [`addListener(eventName,listener)`](https://nodejs.org/api/events.html#emitteraddlistenereventname-listener) | method | Listens on `original` & `wrapped` |
+| [`on(eventName,listener)`](https://nodejs.org/api/events.html#emitteroneventname-listener) | method | Listens on `original` & `wrapped` |
+| [`once(eventName,listener)`](https://nodejs.org/api/events.html#emitteronceeventname-listener) | method | Listens on `original` & `wrapped` |
+| [`prependListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependlistenereventname-listener) | method | Listens on `original` & `wrapped` |
+| [`prependOnceListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependoncelistenereventname-listener) | method | Listens on `original` & `wrapped` |
+| [`rawListeners(eventName)`](https://nodejs.org/api/events.html#emitterrawlistenerseventname) | method | Lists only `wrapped` listeners |
+| [`listeners(eventName)`](https://nodejs.org/api/events.html#emitterlistenerseventname) | method | Lists only `wrapped` listeners |
+| [`listenerCount(eventName[,listener])`](https://nodejs.org/api/events.html#emitterlistenercounteventname-listener) | method | Counts only `wrapped` listeners |
+| [`eventNames()`](https://nodejs.org/api/events.html#emittereventnames) | method | Lists only `wrapped` listeners |
+| [`emit(eventName[,...args])`](https://nodejs.org/api/events.html#emitteremiteventname-args) | method | Directly calls `original` method |
+| [`removeAllListeners([eventName])`](https://nodejs.org/api/events.html#emitterremovealllistenerseventname) | method | Removes only `wrapped` listeners |
+| [`removeListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterremovelistenereventname-listener) | method | Removes on both `original` & `wrapped` |
+| [`off(eventName,listener)`](https://nodejs.org/api/events.html#emitteroffeventname-listener) | method | Removes on both `original` & `wrapped` |
+| [`getMaxListeners()`](https://nodejs.org/api/events.html#emittergetmaxlisteners) | method | Directly calls `original` method |
+| [`setMaxListeners(n)`](https://nodejs.org/api/events.html#emittersetmaxlistenersn) | method | Directly calls `original` method |
 
 When the wrapper has events listening on the original EventEmitter, a `removeListener` event will be internally listened on for clean-up after an event is removed.
 
