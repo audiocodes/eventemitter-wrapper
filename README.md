@@ -11,114 +11,146 @@ This module lets you group event listeners so you can seperate/isolate listeners
 
 ## Why use this?
 
-If you have an EventEmitter which has important event listeners on it, and you have a module that you want others to use without them removing those said event listeners by mistake, then this will let you protect them by exporting the wrapped EventEmitter instead of the main one.
+If you have an `EventEmitter` which has important event listeners on it, and you have a module that you want others to use without them removing those said event listeners by mistake, then this will let you protect them by exporting the wrapped `EventEmitter` instead of the main one.
 
 Or, in the case of why I needed this module, I have portions of my applications as reloadable, and each time some code unloads, I have the events on a wrapper that I simply remove the listeners from without effecting other parts of my application.
 
 ## Installation
 
-Install the module via [NPM](https://www.npmjs.com/package/eventemitter-wrapper)
+**Install via NPM:** with the [NPM package][npm-url]
 ```
-npm install eventemitter-wrapper --save
+npm install eventemitter-wrapper
 ```
-Or [download the latest release](https://github.com/Jashepp/eventemitter-wrapper/releases), or git clone the [repository on GitHub](https://github.com/Jashepp/eventemitter-wrapper).
+
+**Install via NPM from Github:** with a [GitHub Tag][github-tags] to specify version (specifed as #hash)
+```
+npm install jashepp/eventemitter-wrapper#v1.0.0
+```
+
+Or [download the latest release][github-releases], or [use github packages](https://github.com/Jashepp/eventemitter-wrapper/pkgs/npm/eventemitter-wrapper), or git clone the [repository on GitHub][github-url].
 
 This module is written with ES6 features.
 
-### How to use
+## How To Use / API
 
-Require the module, wrap an existing eventEmitter instance, and use methods as you usually would.
+This module is available as both CommonJS and ES Module. The ES Module calls the CommonJS file under the hood.
+
+Require or import the module, wrap an existing `EventEmitter` instance, and use methods as you usually would.
+
+This should behave like the [original EventEmitter](https://nodejs.org/api/events.html), with the same methods and functionality, since it wraps it and uses it under the hood.
+
+CommonJS Method:
 
 ```javascript
-const eventEmitter = require('events');
-const eventEmitterWrapper = require('eventemitter-wrapper');
+const EventEmitter = require('node:events');
+const EventEmitterWrapper = require('eventemitter-wrapper');
 
-const events = new eventEmitter();
-const eventGroup1 = eventEmitterWrapper.createWrapper(events);
-const eventGroup2 = eventEmitterWrapper.createWrapper(events);
-...
+const events = new EventEmitter();
+const eventsWrapped = new EventEmitterWrapper(events);
+// ...
 ```
 
-The first argument for `createWrapper`, can be any object that is an EventEmitter directly or prototyped.
+ES Module Method:
 
-The methods are meant to be identical to [Node.js's EventEmitter](https://nodejs.org/api/events.html) (minus deprecated features).
+```javascript
+import { EventEmitter } from 'node:events';
+import { EventEmitterWrapper } from 'eventemitter-wrapper';
 
-Methods on the wrapper: `addListener`, `on`, `once`, `listeners`, `listenerCount`, `eventNames`, `emit`, `prependListener`, `prependOnceListener`, `removeAllListeners`, `removeListener`
+const events = new EventEmitter();
+const eventsWrapped = new EventEmitterWrapper(events);
+// ...
+```
 
-Internal properties: `_eventStore` (object key store of events and listeners), `_eventEmitterInstance` (the main EventEmitter)
+The passed argument for `EventEmitterWrapper` can be any object that is an EventEmitter directly or prototyped.
 
-## Example
+The old `v1.0` method of creating the wrapped EventEmitter is still available:
+
+```javascript
+const eventsWrapped = EventEmitterWrapper.createWrapper(events);
+```
+
+### Methods & Properties
+
+API for the wrapped instance created via `new EventEmitterWrapper(events);`
+
+| Wrapped | Type | Original  | Notes |
+|-|-|-|-|
+| `eventEmitter` | prop | N/A | Original `EventEmitter` |
+| `addListener(eventName,listener)` | method | [`addListener(eventName,listener)`](https://nodejs.org/api/events.html#emitteraddlistenereventname-listener) | Listens on `original` & `wrapped` |
+| `on(eventName,listener)` | method | [`on(eventName,listener)`](https://nodejs.org/api/events.html#emitteroneventname-listener) | Listens on `original` & `wrapped` |
+| `once(eventName,listener)` | method | [`once(eventName, listener)`](https://nodejs.org/api/events.html#emitteronceeventname-listener) | Listens on `original` & `wrapped` |
+| `prependListener(eventName,listener)` | method | [`prependListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependlistenereventname-listener) | Listens on `original` & `wrapped` |
+| `prependOnceListener(eventName,listener)` | method | [`prependOnceListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterprependoncelistenereventname-listener) | Listens on `original` & `wrapped` |
+| `rawListeners(eventName)` | method | [`rawListeners(eventName)`](https://nodejs.org/api/events.html#emitterrawlistenerseventname) | Lists only `wrapped` listeners |
+| `listeners(eventName)` | method | [`listeners(eventName)`](https://nodejs.org/api/events.html#emitterlistenerseventname) | Lists only `wrapped` listeners |
+| `listenerCount(eventName[,listener])` | method | [`listenerCount(eventName[,listener])`](https://nodejs.org/api/events.html#emitterlistenercounteventname-listener) | Counts only `wrapped` listeners |
+| `eventNames()` | method | [`eventNames()`](https://nodejs.org/api/events.html#emittereventnames) | Lists only `wrapped` listeners |
+| `emit(eventName[,...args])` | method | [`emit(eventName[,...args])`](https://nodejs.org/api/events.html#emitteremiteventname-args) | Directly calls `original` method |
+| `removeAllListeners([eventName])` | method | [`removeAllListeners([eventName])`](https://nodejs.org/api/events.html#emitterremovealllistenerseventname) | Removes only `wrapped` listeners |
+| `removeListener(eventName,listener)` | method | [`removeListener(eventName,listener)`](https://nodejs.org/api/events.html#emitterremovelistenereventname-listener) | Removes on both `original` & `wrapped` |
+| `off(eventName,listener)` | method | [`off(eventName,listener)`](https://nodejs.org/api/events.html#emitteroffeventname-listener) | Removes on both `original` & `wrapped` |
+| `getMaxListeners()` | method | [`getMaxListeners()`](https://nodejs.org/api/events.html#emittergetmaxlisteners) | Directly calls `original` method |
+| `setMaxListeners(n)` | method | [`setMaxListeners(n)`](https://nodejs.org/api/events.html#emittersetmaxlistenersn) | Directly calls `original` method |
+
+When the wrapper has events listening on the original EventEmitter, a `removeListener` event will be internally listened on for clean-up after an event is removed.
+
+On this wrapper, there are internal methods & properties prefixed with '`_eew`'. These are available (see source code) to use, but they may change in future releases.
+
+### Examples
 
 ```javascript
 // Require modules
-const eventEmitter = require('events');
-const eventEmitterWrapper = require('eventemitter-wrapper');
+const EventEmitter = require('node:events');
+const EventEmitterWrapper = require('eventemitter-wrapper');
 
-// Create EventEmitter instance
-const events = new eventEmitter();
+// Create instances
+const events = new EventEmitter();
+const eventsWrapped = new EventEmitterWrapper(events);
 
-// Attach a listener to `events`
-events.on('logSomething',(...args)=>{
-	console.log('events:',...args);
+// Attach a listener to original EventEmitter
+events.on('original',(...args)=>{
+	console.log('original:',...args);
 });
 
-// Create a wrapped events instance
-const eventGroup1 = eventEmitterWrapper.createWrapper(events);
+// Fire event on either original or wrapped
+events.emit('original','foo');
+// Logs: original: foo
 
-// All events on the main EventEmitter are still emittable
-// Any wrapper or the main EventEmitter can call .emit to run any listener
-eventGroup1.emit('logSomething','Hello','World!');
-// Logs: events: Hello World!
-
-// Any event listener can be created, even if there are other listeners on the main EventEmitter or on other wrappers.
-eventGroup1.on('logSomething',()=>{
-	console.log('eventGroup1: No, I have joined the dark side');
-});
-eventGroup1.on('dance',()=>{
-	console.log('eventGroup1: Okay');
+// Attach a listener to wrapped EventEmitter
+eventsWrapped.on('wrapped',(...args)=>{
+	console.log('wrapped:',...args);
 });
 
-// Emit again (same with eventGroup1.emit...)
-events.emit('logSomething','Foo Bar');
-// Logs: events: Foo Bar!
-// Logs: eventGroup1: No, I have joined the dark side
+// Fire event on either original or wrapped
+events.emit('wrapped','bar');
+// Logs: wrapped: bar
 
-// Emit again (same with eventGroup1.emit...)
-// The emit method falls directly to the main EventEmitter, so it will also work across all wrappers
-events.emit('dance');
-// Logs: eventGroup1: Okay
+// Fetch a list of events on the original
+// "removeListener" event is used by the wrapper for event clean-up
+console.log(events.eventNames());
+// Logs: [ 'original', 'wrapped', 'removeListener' ]
 
-// Fetch a list of event names on the main EventEmitter
-// Notice that the main EventEmitter contains all listeners, including those on a wrapper
-// The "removeListener" event is attached internally via a wrapper
-console.log(events.eventNames())
-// Logs: ["logSomething", "removeListener", "dance"]
-
-// Fetch a list of event names on the wrapper
-// Notice that the wrapper ignores all listeners outside this wrapper
-console.log(eventGroup1.eventNames())
-// Logs: ["logSomething", "dance"]
+// Fetch a list of events on the wrapper
+console.log(eventsWrapped.eventNames());
+// Logs: [ 'wrapped' ]
 
 // Remove all listeners on the wrapper
-eventGroup1.removeAllListeners()
+eventsWrapped.removeAllListeners();
 
-// List event names on the main EventEmitter
-// Notice that "dance" has been removed, also the "logSomething" event now only has 1 listener instead of 2
-console.log(events.eventNames())
-// Logs: ["logSomething", "removeListener"]
+// Fetch a list of events on the original
+console.log(events.eventNames());
+// Logs: [ 'original' ]
 
-// List event names on the wrapper
-// All events attached via the wrapper have been removed
-console.log(eventGroup1.eventNames())
+// Fetch a list of events on the wrapper
+console.log(eventsWrapped.eventNames());
 // Logs: []
-
 ```
 
 ## Tests
 
-Tests are located within `./tests/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include tests.
+Tests are located within `./tests/` on the git [repository on GitHub][github-url] or locally if pulled. NPM version does **not** include tests.
 
-To get started with tests, enter local directory of this repository and run:
+To get started with tests, we need to install some dev dependencies. Enter local directory of this repository and run:
 ```
 npm install --only=dev
 ```
@@ -130,14 +162,16 @@ npm run test
 
 To continuously run tests while editing, run:
 ```
-npm run watch:test
+npm run test-watch
 ```
 
 ## Contributors
 
-Create issues on the GitHub project or create pull requests.
+To submit a contribution, create issues or pull requests on the [GitHub repository][github-url].
 
-All the help is appreciated.
+Please be sure to run tests after any changes.
+
+All help is appreciated. Even if it's just improvements to this readme or the tests.
 
 ## License
 
@@ -172,6 +206,8 @@ NPM Package: [https://www.npmjs.com/package/eventemitter-wrapper](https://www.np
 [npm-image]: https://img.shields.io/npm/v/eventemitter-wrapper.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/eventemitter-wrapper
 [npm-downloads]: https://img.shields.io/npm/dm/eventemitter-wrapper.svg?style=flat-square
-[github-branch]: https://github.com/Jashepp/eventemitter-wrapper
+[github-url]: https://github.com/Jashepp/eventemitter-wrapper
+[github-releases]: https://github.com/Jashepp/eventemitter-wrapper/releases
+[github-tags]: https://github.com/Jashepp/eventemitter-wrapper/tags
 [github-tests-badge]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/run-tests.yml/badge.svg
 [github-tests-url]: https://github.com/Jashepp/eventemitter-wrapper/actions/workflows/run-tests.yml
