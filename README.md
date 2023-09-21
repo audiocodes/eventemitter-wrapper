@@ -24,7 +24,7 @@ npm install eventemitter-wrapper
 
 **Install via NPM from Github:** with a [GitHub Tag][github-tags] to specify version (specifed as #hash)
 ```
-npm install jashepp/eventemitter-wrapper#v1.0.0
+npm install jashepp/eventemitter-wrapper#v2.0.1
 ```
 
 Or [download the latest release][github-releases], or [use github packages](https://github.com/Jashepp/eventemitter-wrapper/pkgs/npm/eventemitter-wrapper), or git clone the [repository on GitHub][github-url].
