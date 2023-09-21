@@ -7,7 +7,25 @@ const chai = require("chai");
 const { expect, assert, should } = chai;
 
 const EventEmitter = require('node:events');
-const EventEmitterWrapper = require('../');
+let EventEmitterWrapper = null;
+
+describe("Require / Import",async ()=>{
+
+	it("require index.js",async function(){
+		EventEmitterWrapper = require('../index.js');
+		expect(EventEmitterWrapper).to.have.property('EventEmitterWrapper');
+		expect(EventEmitterWrapper).to.have.property('createWrapper');
+	});
+
+	it("import module.mjs",async function(){
+		const modileEEW = await import('../module.mjs');
+		expect(modileEEW).to.have.property('EventEmitterWrapper');
+		expect(modileEEW).to.have.property('createWrapper');
+		// createRequire causes new copy
+		// expect(modileEEW.EventEmitterWrapper).to.equal(EventEmitterWrapper.EventEmitterWrapper);
+	});
+
+});
 
 describe("Misc Features",async ()=>{
 
@@ -138,7 +156,7 @@ describe("EventEmitter Compatability - Quick Checks",async ()=>{
 			expect(events).to.not.have.property(prop);
 			expect(wrapper[prop]).to.not.equal(events[prop]);
 			if(whitelistProps.includes(prop)) continue;
-			expect(prop).to.match(/^_/,"Invalid prefix");
+			expect(prop).to.match(/^_eew/,"Invalid prefix");
 		}
 	});
 
