@@ -90,6 +90,16 @@ class EventEmitterWrapper {
 		return this;
 	}
 
+	prependListener(eventName,listener){
+		this._eewListenEventMethod('prependListener',eventName,listener);
+		return this;
+	}
+
+	prependOnceListener(eventName,listener){
+		this._eewOnce('prependOnceListener',eventName,listener);
+		return this;
+	}
+
 	rawListeners(eventName){
 		if(this._eewEventStore.has(eventName)) return [...this._eewEventStore.get(eventName).keys()];
 		return [];
@@ -114,16 +124,6 @@ class EventEmitterWrapper {
 
 	emit(eventName,...args){
 		return this._eewEmitter.emit(eventName,...args);
-	}
-
-	prependListener(eventName,listener){
-		this._eewListenEventMethod('prependListener',eventName,listener);
-		return this;
-	}
-
-	prependOnceListener(eventName,listener){
-		this._eewOnce('prependOnceListener',eventName,listener);
-		return this;
 	}
 
 	removeAllListeners(eventName){
