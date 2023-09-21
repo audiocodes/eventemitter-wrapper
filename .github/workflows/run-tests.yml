@@ -5,11 +5,13 @@ on:
   push:
     paths:
       - '**.js'
+      - '**.mjs'
       - '**.json'
       - '.github/workflows/run-tests.yml'
   pull_request:
     paths:
       - '**.js'
+      - '**.mjs'
       - '**.json'
       - '.github/workflows/run-tests.yml'
 
