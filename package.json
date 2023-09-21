@@ -2,7 +2,15 @@
   "name": "eventemitter-wrapper",
   "version": "1.0.0",
   "description": "Control event groups",
+  "type": "commonjs",
   "main": "./index.js",
+  "module": "./module.mjs",
+  "exports": {
+    ".": {
+      "import": "./module.mjs",
+      "require": "./index.js"
+    }
+  },
   "scripts": {
     "test": "mocha -t 10000 --recursive tests/**/*.js --check-leaks --use_strict --exit",
     "test-parallel": "mocha -t 10000 --recursive tests/**/*.js --check-leaks --use_strict --parallel --exit",
