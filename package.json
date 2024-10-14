@@ -1,6 +1,6 @@
 {
-  "name": "eventemitter-wrapper",
-  "version": "2.0.1",
+  "name": "@audc/eventemitter-wrapper",
+  "version": "2.0.2",
   "description": "Control event groups",
   "type": "commonjs",
   "main": "./index.js",
@@ -8,7 +8,8 @@
   "exports": {
     ".": {
       "import": "./module.mjs",
-      "require": "./index.js"
+      "require": "./index.js",
+      "types": "./index.d.ts"
     }
   },
   "scripts": {
